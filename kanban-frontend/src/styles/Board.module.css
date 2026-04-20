@@ -1,0 +1,111 @@
+.boardShell {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: minmax(280px, 360px) 1fr;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.queryStatus {
+  min-height: 2.25rem;
+}
+
+.error {
+  color: #b91c1c;
+}
+
+.columnsContainer {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.column {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 1rem;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 420px;
+}
+
+.columnHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.columnHeader h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.dropZone {
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  border: 2px dashed transparent;
+  border-radius: 0.75rem;
+  background: #f9fafb;
+}
+
+.dropZoneActive {
+  border-color: #2563eb;
+  background: #eff6ff;
+}
+
+.emptyMessage {
+  color: #6b7280;
+  font-size: 0.95rem;
+}
+
+.statusPanel {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 1rem;
+  padding: 1rem;
+}
+
+.statusPanel h3 {
+  margin-top: 0;
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.badge {
+  padding: 0.45rem 0.8rem;
+  background: #e0f2fe;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  color: #0c4a6e;
+}
+
+@media (max-width: 1024px) {
+  .boardShell {
+    grid-template-columns: 1fr;
+  }
+
+  .columnsContainer {
+    grid-template-columns: 1fr;
+  }
+}
