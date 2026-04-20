@@ -1,5 +1,4 @@
 using Kanban.Api.Common.Errors;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Kanban.Api.Common.Extensions;
 

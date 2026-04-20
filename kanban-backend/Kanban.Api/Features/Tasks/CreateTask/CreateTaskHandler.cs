@@ -9,16 +9,23 @@ namespace Kanban.Api.Features.Tasks.CreateTask;
 public class CreateTaskHandler
 {
     private readonly AppDbContext _context;
+    private readonly ILogger<CreateTaskHandler> _logger;
 
-    public CreateTaskHandler(AppDbContext context)
+    public CreateTaskHandler(AppDbContext context, ILogger<CreateTaskHandler> logger)
     {
         _context = context;
+        _logger = logger;
     }
 
     public async Task<TaskResponse> Handle(CreateTaskRequest request)
     {
+        _logger.LogInformation("Creating new task with title: {Title}", request.Title);
+
         if (string.IsNullOrWhiteSpace(request.Title))
+        {
+            _logger.LogWarning("Task creation failed: Title is required");
             throw new TaskValidationException("Title is required");
+        }
 
         var now = DateTime.UtcNow;
 
@@ -34,6 +41,8 @@ public class CreateTaskHandler
 
         _context.Tasks.Add(task);
         await _context.SaveChangesAsync();
+
+        _logger.LogInformation("Task created successfully with ID: {TaskId}", task.Id);
 
         return new TaskResponse(
             task.Id,

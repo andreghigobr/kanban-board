@@ -10,6 +10,9 @@ using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configure logging
+builder.Logging.AddCustomLogging(builder.Configuration);
+
 // Add services to the container.
 
 builder.Services.AddGlobalExceptionHandling();
@@ -54,7 +57,8 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    DbSeeder.SeedDatabase(dbContext);
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    DbSeeder.SeedDatabase(dbContext, logger);
 }
 
 // Configure the HTTP request pipeline.

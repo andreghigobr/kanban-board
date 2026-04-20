@@ -1,14 +1,22 @@
 using Kanban.Api.Domain.Entities;
+using Microsoft.Extensions.Logging;
 using TaskStatus = Kanban.Api.Domain.Enums.TaskStatus;
 
 namespace Kanban.Api.Infrastructure.Persistence;
 
 public static class DbSeeder
 {
-    public static void SeedDatabase(AppDbContext context)
+    public static void SeedDatabase(AppDbContext context, ILogger logger)
     {
+        logger.LogInformation("Checking if database needs seeding");
+
         if (context.Tasks.Any())
+        {
+            logger.LogInformation("Database already contains tasks, skipping seeding");
             return; // Database already seeded
+        }
+
+        logger.LogInformation("Seeding database with sample tasks");
 
         var sampleTasks = new List<TaskItem>
         {
@@ -61,5 +69,7 @@ public static class DbSeeder
 
         context.Tasks.AddRange(sampleTasks);
         context.SaveChanges();
+
+        logger.LogInformation("Database seeded successfully with {TaskCount} sample tasks", sampleTasks.Count);
     }
 }
