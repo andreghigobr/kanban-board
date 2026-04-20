@@ -114,11 +114,11 @@ export default function Board() {
     moveMutation.mutate({ id: activeTaskId, status: newStatus });
   };
 
-  const handleSubmit = (payload: { title: string; description: string; status: TaskStatus }) => {
+  const handleSubmit = (payload: { title: string; description: string }) => {
     if (editingTask) {
       updateMutation.mutate({ id: editingTask.id, title: payload.title, description: payload.description });
     } else {
-      createMutation.mutate(payload);
+      createMutation.mutate({ title: payload.title, description: payload.description, status: 'todo' });
     }
   };
 
