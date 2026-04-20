@@ -4,3 +4,35 @@ GET {{Kanban.Api_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+
+GET {{Kanban.Api_HostAddress}}/api/tasks
+Accept: application/json
+
+###
+
+POST {{Kanban.Api_HostAddress}}/api/tasks
+Content-Type: application/json
+
+{
+  "title": "Sample Task",
+  "description": "This is a sample task",
+  "status": "ToDo"
+}
+
+###
+
+PUT {{Kanban.Api_HostAddress}}/api/tasks
+Content-Type: application/json
+
+{
+  "taskId": "00000000-0000-0000-0000-000000000000",
+  "title": "Updated Task",
+  "description": "Updated description",
+  "status": "InProgress"
+}
+
+###
+
+DELETE {{Kanban.Api_HostAddress}}/api/tasks/00000000-0000-0000-0000-000000000000
+
+###

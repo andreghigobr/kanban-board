@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Kanban.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("kanban/[controller]")]
 public class TasksController : ControllerBase
 {
     private readonly AppDbContext _context;
@@ -65,5 +65,38 @@ public class TasksController : ControllerBase
             task.UpdatedAt);
 
         return CreatedAtAction(nameof(GetAll), new { id = task.Id }, response);
+    }
+
+    [HttpPut]
+    public async Task<IActionResult> Update(UpdateTaskRequest request)
+    {
+        var task = await _context.Tasks.FindAsync(request.TaskId);
+        if (task == null)
+            return NotFound();
+
+        if (string.IsNullOrWhiteSpace(request.Title))
+            return BadRequest(new { message = "Title is required" });
+
+        task.Title = request.Title.Trim();
+        task.Description = request.Description?.Trim();
+        task.Status = request.Status;
+        task.UpdatedAt = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync();
+
+        return NoContent();
+    }
+
+    [HttpDelete("/{id}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        var task = await _context.Tasks.FindAsync(id);
+        if (task == null)
+            return NotFound();
+
+        _context.Tasks.Remove(task);
+        await _context.SaveChangesAsync();
+
+        return NoContent();
     }
 }
