@@ -1,0 +1,75 @@
+.form {
+  display: grid;
+  gap: 1rem;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 1rem;
+  padding: 1.25rem;
+}
+
+.formHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.formHeader h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.cancelButton {
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #374151;
+  border-radius: 0.75rem;
+  padding: 0.55rem 0.9rem;
+  cursor: pointer;
+}
+
+.label {
+  display: grid;
+  gap: 0.45rem;
+  font-size: 0.95rem;
+  color: #111827;
+}
+
+.input,
+.textarea,
+.select {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 0.85rem;
+  padding: 0.75rem 0.9rem;
+  font-size: 0.95rem;
+  color: #111827;
+  background: #f9fafb;
+}
+
+.textarea {
+  resize: vertical;
+}
+
+.readOnlyStatus {
+  padding: 0.85rem 1rem;
+  border-radius: 0.85rem;
+  background: #f3f4f6;
+  color: #374151;
+  font-size: 0.95rem;
+}
+
+.submitButton {
+  border: none;
+  background: #2563eb;
+  color: #ffffff;
+  padding: 0.9rem 1rem;
+  font-size: 0.95rem;
+  border-radius: 0.9rem;
+  cursor: pointer;
+}
+
+.submitButton:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}

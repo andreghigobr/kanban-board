@@ -7,6 +7,16 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/Dotnet.gitignore
 
+.idea/
+kanban-frontend/node_modules/
+kanban-frontend/dist/
+kanban-frontend/.vite/
+kanban-frontend/npm-debug.log*
+kanban-frontend/yarn-debug.log*
+kanban-frontend/yarn-error.log*
+kanban-frontend/.DS_Store
+kanban-frontend/.env
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
