@@ -2,6 +2,7 @@ using Kanban.Api.Common.Errors;
 using Kanban.Api.Contracts.Requests;
 using Kanban.Api.Infrastructure.Persistence;
 using Microsoft.Extensions.Logging;
+using TaskStatus = Kanban.Api.Domain.Enums.TaskStatus;
 
 namespace Kanban.Api.Features.Tasks.UpdateTask;
 
@@ -35,6 +36,18 @@ public class UpdateTaskHandler
 
         task.Title = request.Title.Trim();
         task.Description = request.Description?.Trim();
+
+        // Update status if provided
+        if (!string.IsNullOrWhiteSpace(request.Status))
+        {
+            if (!Enum.TryParse<TaskStatus>(request.Status, ignoreCase: true, out var taskStatus))
+            {
+                _logger.LogWarning("Task update failed: Invalid status '{Status}' for task ID {TaskId}", request.Status, request.TaskId);
+                throw new TaskValidationException($"Invalid status '{request.Status}'. Valid values are: todo, inprogress, done");
+            }
+            task.Status = taskStatus;
+        }
+
         task.UpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();

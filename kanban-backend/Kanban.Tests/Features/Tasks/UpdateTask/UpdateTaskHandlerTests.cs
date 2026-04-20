@@ -80,4 +80,42 @@ public class UpdateTaskHandlerTests : IDisposable
         await act.Should().ThrowAsync<TaskValidationException>()
             .WithMessage("Title is required");
     }
+
+    [Fact]
+    public async Task Handle_WithStatus_UpdatesTaskAndStatus()
+    {
+        // Arrange
+        var taskId = Guid.NewGuid();
+        var existingTask = new TaskItem { Id = taskId, Title = "Old Title", Status = TaskStatus.ToDo };
+        _context.Tasks.Add(existingTask);
+        await _context.SaveChangesAsync();
+        var request = new UpdateTaskRequest(taskId, "New Title", "New Description", "done");
+
+        // Act
+        await _handler.Handle(request);
+
+        // Assert
+        var updatedTask = await _context.Tasks.FindAsync(taskId);
+        updatedTask.Should().NotBeNull();
+        updatedTask!.Title.Should().Be("New Title");
+        updatedTask.Status.Should().Be(TaskStatus.Done);
+    }
+
+    [Fact]
+    public async Task Handle_InvalidStatus_ThrowsTaskValidationException()
+    {
+        // Arrange
+        var taskId = Guid.NewGuid();
+        var existingTask = new TaskItem { Id = taskId, Title = "Old Title" };
+        _context.Tasks.Add(existingTask);
+        await _context.SaveChangesAsync();
+        var request = new UpdateTaskRequest(taskId, "New Title", "Description", "invalid_status");
+
+        // Act
+        Func<Task> act = async () => await _handler.Handle(request);
+
+        // Assert
+        await act.Should().ThrowAsync<TaskValidationException>()
+            .WithMessage("*Invalid status*");
+    }
 }

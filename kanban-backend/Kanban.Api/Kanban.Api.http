@@ -5,34 +5,43 @@ Accept: application/json
 
 ###
 
-GET {{Kanban.Api_HostAddress}}/api/tasks
+GET {{Kanban.Api_HostAddress}}/kanban/tasks
 Accept: application/json
 
 ###
 
-POST {{Kanban.Api_HostAddress}}/api/tasks
+POST {{Kanban.Api_HostAddress}}/kanban/tasks
 Content-Type: application/json
 
 {
   "title": "Sample Task",
   "description": "This is a sample task",
-  "status": "ToDo"
+  "status": "todo"
 }
 
 ###
 
-PUT {{Kanban.Api_HostAddress}}/api/tasks
+PUT {{Kanban.Api_HostAddress}}/kanban/tasks
 Content-Type: application/json
 
 {
   "taskId": "00000000-0000-0000-0000-000000000000",
   "title": "Updated Task",
   "description": "Updated description",
-  "status": "InProgress"
+  "status": "inprogress"
 }
 
 ###
 
-DELETE {{Kanban.Api_HostAddress}}/api/tasks/00000000-0000-0000-0000-000000000000
+PATCH {{Kanban.Api_HostAddress}}/kanban/tasks/00000000-0000-0000-0000-000000000000
+Content-Type: application/json
+
+{
+  "status": "done"
+}
+
+###
+
+DELETE {{Kanban.Api_HostAddress}}/kanban/tasks/00000000-0000-0000-0000-000000000000
 
 ###

@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 namespace Kanban.Api.Controllers;
 
 [ApiController]
-[Route("kanban/[controller]")]
+[Route("kanban/tasks")]
 public class TasksController : ControllerBase
 {
     private readonly GetTasksHandler _getTasksHandler;

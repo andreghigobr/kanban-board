@@ -3,6 +3,7 @@ using Kanban.Api.Contracts.Requests;
 using Kanban.Api.Contracts.Responses;
 using Kanban.Api.Domain.Entities;
 using Kanban.Api.Infrastructure.Persistence;
+using TaskStatus = Kanban.Api.Domain.Enums.TaskStatus;
 
 namespace Kanban.Api.Features.Tasks.CreateTask;
 
@@ -27,6 +28,13 @@ public class CreateTaskHandler
             throw new TaskValidationException("Title is required");
         }
 
+        // Convert string status to enum
+        if (!Enum.TryParse<TaskStatus>(request.Status, ignoreCase: true, out var taskStatus))
+        {
+            _logger.LogWarning("Task creation failed: Invalid status '{Status}'", request.Status);
+            throw new TaskValidationException($"Invalid status '{request.Status}'. Valid values are: todo, inprogress, done");
+        }
+
         var now = DateTime.UtcNow;
 
         var task = new TaskItem
@@ -34,7 +42,7 @@ public class CreateTaskHandler
             Id = Guid.NewGuid(),
             Title = request.Title.Trim(),
             Description = request.Description?.Trim(),
-            Status = request.Status,
+            Status = taskStatus,
             CreatedAt = now,
             UpdatedAt = now
         };

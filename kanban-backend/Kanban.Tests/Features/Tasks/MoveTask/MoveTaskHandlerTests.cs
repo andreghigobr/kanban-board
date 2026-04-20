@@ -35,7 +35,7 @@ public class MoveTaskHandlerTests : IDisposable
         var existingTask = new TaskItem { Id = taskId, Title = "Task", Status = TaskStatus.ToDo, UpdatedAt = DateTime.UtcNow.AddDays(-1) };
         _context.Tasks.Add(existingTask);
         await _context.SaveChangesAsync();
-        var request = new MoveTaskRequest(taskId, TaskStatus.InProgress);
+        var request = new MoveTaskRequest(taskId, "inprogress");
 
         // Act
         await _handler.Handle(request);
@@ -52,7 +52,7 @@ public class MoveTaskHandlerTests : IDisposable
     {
         // Arrange
         var taskId = Guid.NewGuid();
-        var request = new MoveTaskRequest(taskId, TaskStatus.Done);
+        var request = new MoveTaskRequest(taskId, "done");
 
         // Act
         Func<Task> act = async () => await _handler.Handle(request);
@@ -60,5 +60,23 @@ public class MoveTaskHandlerTests : IDisposable
         // Assert
         await act.Should().ThrowAsync<TaskNotFoundException>()
             .WithMessage($"Task with ID {taskId} not found");
+    }
+
+    [Fact]
+    public async Task Handle_InvalidStatus_ThrowsTaskValidationException()
+    {
+        // Arrange
+        var taskId = Guid.NewGuid();
+        var existingTask = new TaskItem { Id = taskId, Title = "Task", Status = TaskStatus.ToDo };
+        _context.Tasks.Add(existingTask);
+        await _context.SaveChangesAsync();
+        var request = new MoveTaskRequest(taskId, "invalid_status");
+
+        // Act
+        Func<Task> act = async () => await _handler.Handle(request);
+
+        // Assert
+        await act.Should().ThrowAsync<TaskValidationException>()
+            .WithMessage("*Invalid status*");
     }
 }

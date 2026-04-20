@@ -30,7 +30,7 @@ public class CreateTaskHandlerTests : IDisposable
     public async Task Handle_ValidRequest_CreatesTaskAndReturnsResponse()
     {
         // Arrange
-        var request = new CreateTaskRequest("Test Task", "Description", TaskStatus.ToDo);
+        var request = new CreateTaskRequest("Test Task", "Description", "todo");
 
         // Act
         var result = await _handler.Handle(request);
@@ -72,5 +72,19 @@ public class CreateTaskHandlerTests : IDisposable
         // Assert
         await act.Should().ThrowAsync<TaskValidationException>()
             .WithMessage("Title is required");
+    }
+
+    [Fact]
+    public async Task Handle_InvalidStatus_ThrowsTaskValidationException()
+    {
+        // Arrange
+        var request = new CreateTaskRequest("Test Task", "Description", "invalid_status");
+
+        // Act
+        Func<Task> act = async () => await _handler.Handle(request);
+
+        // Assert
+        await act.Should().ThrowAsync<TaskValidationException>()
+            .WithMessage("*Invalid status*");
     }
 }
