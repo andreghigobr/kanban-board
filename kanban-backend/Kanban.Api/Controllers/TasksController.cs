@@ -1,9 +1,11 @@
 using Kanban.Api.Contracts.Requests;
 using Kanban.Api.Contracts.Responses;
-using Kanban.Api.Domain.Entities;
-using Kanban.Api.Infrastructure.Persistence;
+using Kanban.Api.Features.Tasks.CreateTask;
+using Kanban.Api.Features.Tasks.DeleteTask;
+using Kanban.Api.Features.Tasks.GetTasks;
+using Kanban.Api.Features.Tasks.MoveTask;
+using Kanban.Api.Features.Tasks.UpdateTask;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Kanban.Api.Controllers;
 
@@ -11,92 +13,59 @@ namespace Kanban.Api.Controllers;
 [Route("kanban/[controller]")]
 public class TasksController : ControllerBase
 {
-    private readonly AppDbContext _context;
+    private readonly GetTasksHandler _getTasksHandler;
+    private readonly CreateTaskHandler _createTaskHandler;
+    private readonly UpdateTaskHandler _updateTaskHandler;
+    private readonly DeleteTaskHandler _deleteTaskHandler;
+    private readonly MoveTaskHandler _moveTaskHandler;
 
-    public TasksController(AppDbContext context)
+    public TasksController(
+        GetTasksHandler getTasksHandler,
+        CreateTaskHandler createTaskHandler,
+        UpdateTaskHandler updateTaskHandler,
+        DeleteTaskHandler deleteTaskHandler,
+        MoveTaskHandler moveTaskHandler)
     {
-        _context = context;
+        _getTasksHandler = getTasksHandler;
+        _createTaskHandler = createTaskHandler;
+        _updateTaskHandler = updateTaskHandler;
+        _deleteTaskHandler = deleteTaskHandler;
+        _moveTaskHandler = moveTaskHandler;
     }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<TaskResponse>>> GetAll()
     {
-        var tasks = await _context.Tasks
-            .OrderByDescending(x => x.CreatedAt)
-            .Select(x => new TaskResponse(
-                x.Id,
-                x.Title,
-                x.Description,
-                x.Status.ToString(),
-                x.CreatedAt,
-                x.UpdatedAt))
-            .ToListAsync();
-
+        var tasks = await _getTasksHandler.Handle();
         return Ok(tasks);
     }
 
     [HttpPost]
     public async Task<ActionResult<TaskResponse>> Create(CreateTaskRequest request)
     {
-        if (string.IsNullOrWhiteSpace(request.Title))
-            return BadRequest(new { message = "Title is required" });
-
-        var now = DateTime.UtcNow;
-
-        var task = new TaskItem
-        {
-            Id = Guid.NewGuid(),
-            Title = request.Title.Trim(),
-            Description = request.Description?.Trim(),
-            Status = request.Status,
-            CreatedAt = now,
-            UpdatedAt = now
-        };
-
-        _context.Tasks.Add(task);
-        await _context.SaveChangesAsync();
-
-        var response = new TaskResponse(
-            task.Id,
-            task.Title,
-            task.Description,
-            task.Status.ToString(),
-            task.CreatedAt,
-            task.UpdatedAt);
-
-        return CreatedAtAction(nameof(GetAll), new { id = task.Id }, response);
+        var response = await _createTaskHandler.Handle(request);
+        return CreatedAtAction(nameof(GetAll), new { id = response.TaskId }, response);
     }
 
     [HttpPut]
     public async Task<IActionResult> Update(UpdateTaskRequest request)
     {
-        var task = await _context.Tasks.FindAsync(request.TaskId);
-        if (task == null)
-            return NotFound();
-
-        if (string.IsNullOrWhiteSpace(request.Title))
-            return BadRequest(new { message = "Title is required" });
-
-        task.Title = request.Title.Trim();
-        task.Description = request.Description?.Trim();
-        task.Status = request.Status;
-        task.UpdatedAt = DateTime.UtcNow;
-
-        await _context.SaveChangesAsync();
-
+        await _updateTaskHandler.Handle(request);
         return NoContent();
     }
 
-    [HttpDelete("/{id}")]
+    [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        var task = await _context.Tasks.FindAsync(id);
-        if (task == null)
-            return NotFound();
+        await _deleteTaskHandler.Handle(id);
+        return NoContent();
+    }
 
-        _context.Tasks.Remove(task);
-        await _context.SaveChangesAsync();
-
+    [HttpPatch("{id}")]
+    public async Task<IActionResult> MoveTask(Guid id, MoveTaskRequest request)
+    {
+        var moveRequest = request with { TaskId = id };
+        await _moveTaskHandler.Handle(moveRequest);
         return NoContent();
     }
 }

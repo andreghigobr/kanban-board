@@ -1,3 +1,9 @@
+using Kanban.Api.Common.Extensions;
+using Kanban.Api.Features.Tasks.CreateTask;
+using Kanban.Api.Features.Tasks.DeleteTask;
+using Kanban.Api.Features.Tasks.GetTasks;
+using Kanban.Api.Features.Tasks.MoveTask;
+using Kanban.Api.Features.Tasks.UpdateTask;
 using Kanban.Api.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
@@ -6,9 +12,16 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddGlobalExceptionHandling();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+// Register feature handlers
+builder.Services.AddScoped<GetTasksHandler>();
+builder.Services.AddScoped<CreateTaskHandler>();
+builder.Services.AddScoped<UpdateTaskHandler>();
+builder.Services.AddScoped<DeleteTaskHandler>();
+builder.Services.AddScoped<MoveTaskHandler>();
 
 // Add CORS
 builder.Services.AddCors(options =>

@@ -13,14 +13,4 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.7" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Common\Errors\" />
-    <Folder Include="Common\Extensions\" />
-    <Folder Include="Features\Tasks\CreateTask\" />
-    <Folder Include="Features\Tasks\DeleteTask\" />
-    <Folder Include="Features\Tasks\GetTasks\" />
-    <Folder Include="Features\Tasks\MoveTask\" />
-    <Folder Include="Features\Tasks\UpdateTask\" />
-  </ItemGroup>
-
 </Project>
