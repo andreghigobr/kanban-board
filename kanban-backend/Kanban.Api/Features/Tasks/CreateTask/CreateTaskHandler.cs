@@ -18,7 +18,7 @@ public class CreateTaskHandler
         _logger = logger;
     }
 
-    public async Task<TaskResponse> Handle(CreateTaskRequest request)
+    public async Task<TaskResponse> Handle(CreateTaskRequest request, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("Creating new task with title: {Title}", request.Title);
 
@@ -48,7 +48,7 @@ public class CreateTaskHandler
         };
 
         _context.Tasks.Add(task);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation("Task created successfully with ID: {TaskId}", task.Id);
 

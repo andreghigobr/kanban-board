@@ -38,11 +38,11 @@ public class TasksController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<TaskResponse>>> GetAll()
+    public async Task<ActionResult<IEnumerable<TaskResponse>>> GetAll(CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("HTTP GET /kanban/tasks - Retrieving all tasks");
 
-        var tasks = await _getTasksHandler.Handle();
+        var tasks = await _getTasksHandler.Handle(cancellationToken);
 
         _logger.LogInformation("HTTP GET /kanban/tasks - Returned {TaskCount} tasks", tasks.Count());
 
@@ -50,11 +50,11 @@ public class TasksController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<TaskResponse>> Create(CreateTaskRequest request)
+    public async Task<ActionResult<TaskResponse>> Create(CreateTaskRequest request, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("HTTP POST /kanban/tasks - Creating new task with title: {Title}", request.Title);
 
-        var response = await _createTaskHandler.Handle(request);
+        var response = await _createTaskHandler.Handle(request, cancellationToken);
 
         _logger.LogInformation("HTTP POST /kanban/tasks - Task created with ID: {TaskId}", response.TaskId);
 
@@ -62,11 +62,11 @@ public class TasksController : ControllerBase
     }
 
     [HttpPut]
-    public async Task<IActionResult> Update(UpdateTaskRequest request)
+    public async Task<IActionResult> Update(UpdateTaskRequest request, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("HTTP PUT /kanban/tasks - Updating task with ID: {TaskId}", request.TaskId);
 
-        await _updateTaskHandler.Handle(request);
+        await _updateTaskHandler.Handle(request, cancellationToken);
 
         _logger.LogInformation("HTTP PUT /kanban/tasks - Task with ID {TaskId} updated successfully", request.TaskId);
 
@@ -74,11 +74,11 @@ public class TasksController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(Guid id)
+    public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("HTTP DELETE /kanban/tasks/{TaskId} - Deleting task", id);
 
-        await _deleteTaskHandler.Handle(id);
+        await _deleteTaskHandler.Handle(id, cancellationToken);
 
         _logger.LogInformation("HTTP DELETE /kanban/tasks/{TaskId} - Task deleted successfully", id);
 
@@ -86,12 +86,12 @@ public class TasksController : ControllerBase
     }
 
     [HttpPatch("{id}")]
-    public async Task<IActionResult> MoveTask(Guid id, MoveTaskRequest request)
+    public async Task<IActionResult> MoveTask(Guid id, MoveTaskRequest request, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("HTTP PATCH /kanban/tasks/{TaskId} - Moving task to status {Status}", id, request.Status);
 
         var moveRequest = request with { TaskId = id };
-        await _moveTaskHandler.Handle(moveRequest);
+        await _moveTaskHandler.Handle(moveRequest, cancellationToken);
 
         _logger.LogInformation("HTTP PATCH /kanban/tasks/{TaskId} - Task moved to status {Status} successfully", id, request.Status);
 

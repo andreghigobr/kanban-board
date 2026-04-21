@@ -16,7 +16,7 @@ public class GetTasksHandler
         _logger = logger;
     }
 
-    public async Task<IEnumerable<TaskResponse>> Handle()
+    public async Task<IEnumerable<TaskResponse>> Handle(CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("Retrieving all tasks");
 
@@ -29,7 +29,7 @@ public class GetTasksHandler
                 x.Status.ToString(),
                 x.CreatedAt,
                 x.UpdatedAt))
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         _logger.LogInformation("Retrieved {TaskCount} tasks", tasks.Count);
 

@@ -17,11 +17,11 @@ public class UpdateTaskHandler
         _logger = logger;
     }
 
-    public async Task Handle(UpdateTaskRequest request)
+    public async Task Handle(UpdateTaskRequest request, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("Updating task with ID: {TaskId}", request.TaskId);
 
-        var task = await _context.Tasks.FindAsync(request.TaskId);
+        var task = await _context.Tasks.FindAsync(new object[] { request.TaskId }, cancellationToken);
         if (task == null)
         {
             _logger.LogWarning("Task update failed: Task with ID {TaskId} not found", request.TaskId);
@@ -50,7 +50,7 @@ public class UpdateTaskHandler
 
         task.UpdatedAt = DateTime.UtcNow;
 
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation("Task with ID {TaskId} updated successfully", request.TaskId);
     }

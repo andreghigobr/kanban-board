@@ -17,7 +17,7 @@ public class MoveTaskHandler
         _logger = logger;
     }
 
-    public async Task Handle(MoveTaskRequest request)
+    public async Task Handle(MoveTaskRequest request, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("Moving task {TaskId} to status {Status}", request.TaskId, request.Status);
 
@@ -28,7 +28,7 @@ public class MoveTaskHandler
             throw new TaskValidationException($"Invalid status '{request.Status}'. Valid values are: todo, inprogress, done");
         }
 
-        var task = await _context.Tasks.FindAsync(request.TaskId);
+        var task = await _context.Tasks.FindAsync(new object[] { request.TaskId }, cancellationToken);
         if (task == null)
         {
             _logger.LogWarning("Task move failed: Task with ID {TaskId} not found", request.TaskId);
@@ -38,7 +38,7 @@ public class MoveTaskHandler
         task.Status = taskStatus;
         task.UpdatedAt = DateTime.UtcNow;
 
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation("Task {TaskId} moved to status {Status} successfully", request.TaskId, taskStatus);
     }
