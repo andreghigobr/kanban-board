@@ -28,7 +28,7 @@ This is the backend API for the Kanban Board application, built with ASP.NET Cor
 
 1. From the `kanban-backend` directory, run:
    ```bash
-   dotnet run --project Kanban.Api
+   dotnet run --project Kanban.Api/Kanban.Api.csproj
    ```
 
    The API will start on `http://localhost:5257` (or the port configured in `appsettings.json`).

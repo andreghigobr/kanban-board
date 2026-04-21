@@ -66,7 +66,7 @@ The backend exposes a RESTful API under the `/kanban/tasks` endpoint. The full A
 
 3. Run:
    ```bash
-   dotnet run --project Kanban.Api
+   dotnet run --project Kanban.Api/Kanban.Api.csproj
    ```
 
    Runs on `http://localhost:5257`.
@@ -88,13 +88,13 @@ The backend exposes a RESTful API under the `/kanban/tasks` endpoint. The full A
    npm run dev
    ```
 
-   Runs on `http://localhost:5173` with API proxy to backend.
+   Runs on `http://localhost:4173` with API proxy to backend.
 
 ### Full Application
 
 1. Start the backend first.
 2. Start the frontend.
-3. Open `http://localhost:5173` in your browser.
+3. Open `http://localhost:4173` in your browser.
 
 ## Testing
 

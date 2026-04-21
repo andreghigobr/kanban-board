@@ -26,7 +26,7 @@ This is the frontend application for the Kanban Board, built with React 19, Type
    npm run dev
    ```
 
-   The app will run on `http://localhost:5173` and proxy API calls to the backend.
+   The app will run on `http://localhost:4173` and proxy API calls to the backend.
 
 ## Building the Application
 
