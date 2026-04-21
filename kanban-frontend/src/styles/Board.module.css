@@ -10,6 +10,22 @@
   gap: 1.5rem;
 }
 
+.createButton {
+  border: none;
+  background: #2563eb;
+  color: #ffffff;
+  padding: 0.9rem 1rem;
+  font-size: 0.95rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.createButton:hover {
+  background: #1d4ed8;
+}
+
 .content {
   display: flex;
   flex-direction: column;

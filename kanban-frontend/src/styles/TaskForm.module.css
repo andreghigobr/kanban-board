@@ -1,10 +1,6 @@
 .form {
   display: grid;
   gap: 1rem;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 1rem;
-  padding: 1.25rem;
 }
 
 .formHeader {
@@ -17,15 +13,6 @@
 .formHeader h2 {
   margin: 0;
   font-size: 1.1rem;
-}
-
-.cancelButton {
-  border: 1px solid #d1d5db;
-  background: #ffffff;
-  color: #374151;
-  border-radius: 0.75rem;
-  padding: 0.55rem 0.9rem;
-  cursor: pointer;
 }
 
 .label {
@@ -59,14 +46,41 @@
   font-size: 0.95rem;
 }
 
+.buttonGroup {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.cancelButton {
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #374151;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.cancelButton:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
 .submitButton {
   border: none;
   background: #2563eb;
   color: #ffffff;
-  padding: 0.9rem 1rem;
+  padding: 0.75rem 1.5rem;
   font-size: 0.95rem;
-  border-radius: 0.9rem;
+  border-radius: 0.75rem;
   cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.submitButton:hover:not(:disabled) {
+  background: #1d4ed8;
 }
 
 .submitButton:disabled {

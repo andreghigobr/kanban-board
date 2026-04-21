@@ -5,6 +5,7 @@ import type { Task, TaskStatus } from '../types';
 import { fetchTasks, createTask, updateTask, deleteTask, moveTask } from '../api';
 import TaskCard from './TaskCard';
 import TaskForm from './TaskForm';
+import Modal from './Modal';
 import styles from '../styles/Board.module.css';
 
 const statuses: Array<{ key: TaskStatus; label: string }> = [
@@ -55,6 +56,7 @@ export default function Board() {
   const queryClient = useQueryClient();
   const [activeId, setActiveId] = useState<string | null>(null);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const tasksQuery = useQuery<Task[]>({
     queryKey: ['tasks'],
@@ -65,7 +67,10 @@ export default function Board() {
 
   const createMutation = useMutation({
     mutationFn: createTask,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['tasks'] })
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      setIsModalOpen(false);
+    }
   });
 
   const updateMutation = useMutation({
@@ -73,6 +78,7 @@ export default function Board() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       setEditingTask(null);
+      setIsModalOpen(false);
     }
   });
 
@@ -124,10 +130,17 @@ export default function Board() {
 
   const handleEdit = (task: Task) => {
     setEditingTask(task);
+    setIsModalOpen(true);
   };
 
   const handleCancelEdit = () => {
     setEditingTask(null);
+    setIsModalOpen(false);
+  };
+
+  const handleCreateTask = () => {
+    setEditingTask(null);
+    setIsModalOpen(true);
   };
 
   const handleDelete = (id: string) => {
@@ -139,13 +152,9 @@ export default function Board() {
   return (
     <div className={styles.boardShell}>
       <aside className={styles.sidebar}>
-        <TaskForm
-          key={editingTask?.id ?? 'create'}
-          initialTask={editingTask ?? undefined}
-          onSubmit={handleSubmit}
-          onCancel={editingTask ? handleCancelEdit : undefined}
-          isSaving={createMutation.isPending || updateMutation.isPending}
-        />
+        <button className={styles.createButton} onClick={handleCreateTask}>
+          + Create Task
+        </button>
         <div className={styles.statusPanel}>
           <h3>Task Status</h3>
           <p>Drag any task into a new column to update its status.</p>
@@ -185,6 +194,20 @@ export default function Board() {
           <DragOverlay>{activeTask ? <TaskCard task={activeTask} onEdit={() => {}} onDelete={() => {}} isOverlay /> : null}</DragOverlay>
         </DndContext>
       </section>
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={handleCancelEdit}
+        title={editingTask ? 'Edit task' : 'Create task'}
+      >
+        <TaskForm
+          key={editingTask?.id ?? 'create'}
+          initialTask={editingTask ?? undefined}
+          onSubmit={handleSubmit}
+          onCancel={handleCancelEdit}
+          isSaving={createMutation.isPending || updateMutation.isPending}
+        />
+      </Modal>
     </div>
   );
 }

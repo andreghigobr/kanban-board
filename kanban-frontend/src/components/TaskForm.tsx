@@ -32,15 +32,6 @@ export default function TaskForm({ initialTask, onSubmit, onCancel, isSaving }: 
 
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
-      <div className={styles.formHeader}>
-        <h2>{initialTask ? 'Edit Task' : 'Create Task'}</h2>
-        {initialTask && onCancel ? (
-          <button type="button" className={styles.cancelButton} onClick={onCancel}>
-            Cancel
-          </button>
-        ) : null}
-      </div>
-
       <label className={styles.label}>
         Title
         <input
@@ -68,9 +59,16 @@ export default function TaskForm({ initialTask, onSubmit, onCancel, isSaving }: 
         <div className={styles.readOnlyStatus}>Status: {initialTask.status}</div>
       ) : null}
 
-      <button type="submit" className={styles.submitButton} disabled={isSaving}>
-        {isSaving ? 'Saving…' : initialTask ? 'Update Task' : 'Create Task'}
-      </button>
+      <div className={styles.buttonGroup}>
+        {onCancel && (
+          <button type="button" className={styles.cancelButton} onClick={onCancel}>
+            Cancel
+          </button>
+        )}
+        <button type="submit" className={styles.submitButton} disabled={isSaving}>
+          {isSaving ? 'Saving…' : initialTask ? 'Update task' : 'Create task'}
+        </button>
+      </div>
     </form>
   );
 }
