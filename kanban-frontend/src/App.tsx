@@ -6,8 +6,9 @@ export default function App() {
     <div className={styles.appContainer}>
       <header className={styles.header}>
         <div>
-          <h1>Kanban Board</h1>
+          <h1>Effi Kanban Board</h1>
           <p>React 19 + TypeScript + Vite + TanStack Query + dnd-kit</p>
+          <a href="https://github.com/andreghigobr/kanban-board" target="_blank" rel="noopener noreferrer">View on Github</a>
         </div>
       </header>
       <main className={styles.main}> 

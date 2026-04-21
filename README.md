@@ -1,4 +1,4 @@
-# Kanban Board
+# Effi Kanban Board
 
 A full-stack Kanban board application with a React frontend and ASP.NET Core backend.
 
