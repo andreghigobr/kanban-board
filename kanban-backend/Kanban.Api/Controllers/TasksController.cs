@@ -37,27 +37,27 @@ public class TasksController : ControllerBase
         _logger = logger;
     }
 
-    [HttpGet]
-    public async Task<ActionResult<GetTasksResponse>> GetAll(
+    [HttpGet("{status}")]
+    public async Task<ActionResult<GetTasksResponse>> GetByStatus(
+        string status,
         [FromQuery] int? page = null,
         [FromQuery] int? pageSize = null,
-        [FromQuery] string? status = null,
         CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation("HTTP GET /kanban/tasks - Retrieving tasks with filters - Page: {Page}, PageSize: {PageSize}, Status: {Status}",
-            page, pageSize, status);
+        _logger.LogInformation("HTTP GET /kanban/tasks/{Status} - Retrieving tasks with filters - Page: {Page}, PageSize: {PageSize}",
+            status, page, pageSize);
 
         var request = new GetTasksRequest
         {
+            Status = status,
             Page = page,
-            PageSize = pageSize,
-            Status = status
+            PageSize = pageSize
         };
 
         var response = await _getTasksHandler.Handle(request, cancellationToken);
 
-        _logger.LogInformation("HTTP GET /kanban/tasks - Returned {TaskCount} tasks (page {Page} of {TotalPages})",
-            response.Tasks.Count(), response.Page, response.TotalPages);
+        _logger.LogInformation("HTTP GET /kanban/tasks/{Status} - Returned {TaskCount} tasks (page {Page} of {TotalPages})",
+            status, response.Tasks.Count(), response.Page, response.TotalPages);
 
         return Ok(response);
     }
@@ -71,7 +71,7 @@ public class TasksController : ControllerBase
 
         _logger.LogInformation("HTTP POST /kanban/tasks - Task created with ID: {TaskId}", response.TaskId);
 
-        return CreatedAtAction(nameof(GetAll), new { id = response.TaskId }, response);
+        return CreatedAtAction(nameof(GetByStatus), new { status = response.Status }, response);
     }
 
     [HttpPut]

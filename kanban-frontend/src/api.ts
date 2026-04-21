@@ -60,11 +60,8 @@ function mapTaskResponse(task: TaskResponse): Task {
   };
 }
 
-export async function fetchTasks(status?: TaskStatus, page?: number, pageSize?: number): Promise<Task[]> {
+export async function fetchTasks(status: TaskStatus, page?: number, pageSize?: number): Promise<Task[]> {
   const params = new URLSearchParams();
-  if (status) {
-    params.append('status', backendStatusByFrontend[status]);
-  }
   if (page !== undefined) {
     params.append('page', page.toString());
   }
@@ -72,7 +69,7 @@ export async function fetchTasks(status?: TaskStatus, page?: number, pageSize?: 
     params.append('pageSize', pageSize.toString());
   }
 
-  const url = `${API_BASE}/kanban/tasks${params.toString() ? `?${params.toString()}` : ''}`;
+  const url = `${API_BASE}/kanban/tasks/${backendStatusByFrontend[status]}${params.toString() ? `?${params.toString()}` : ''}`;
   const response = await fetch(url);
   await checkResponse(response);
 

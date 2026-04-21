@@ -21,13 +21,25 @@ public class GetTasksHandler
 
     public async Task<GetTasksResponse> Handle(GetTasksRequest request, CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation("Retrieving tasks with filters - Page: {Page}, PageSize: {PageSize}, Status: {Status}",
-            request.Page, request.PageSize, request.Status);
+        _logger.LogInformation("Retrieving tasks with filters - Status: {Status}, Page: {Page}, PageSize: {PageSize}",
+            request.Status, request.Page, request.PageSize);
+
+        // Validate status
+        if (string.IsNullOrWhiteSpace(request.Status))
+        {
+            _logger.LogWarning("Status is required");
+            throw new TaskValidationException("Status is required");
+        }
+
+        if (!Enum.TryParse<TaskStatus>(request.Status, ignoreCase: true, out var taskStatus))
+        {
+            _logger.LogWarning("Invalid status filter: {Status}", request.Status);
+            throw new TaskValidationException($"Invalid status '{request.Status}'. Valid values are: todo, inprogress, done");
+        }
 
         // Set defaults
         var page = request.Page ?? 1;
         var pageSize = request.PageSize ?? 50; // Default page size
-        var statusFilter = request.Status;
 
         // Validate parameters
         if (page < 1)
@@ -43,18 +55,9 @@ public class GetTasksHandler
         // Build query
         var query = _context.Tasks.AsQueryable();
 
-        // Apply status filter if provided
-        if (!string.IsNullOrWhiteSpace(statusFilter))
-        {
-            if (!Enum.TryParse<TaskStatus>(statusFilter, ignoreCase: true, out var taskStatus))
-            {
-                _logger.LogWarning("Invalid status filter: {Status}", statusFilter);
-                throw new TaskValidationException($"Invalid status '{statusFilter}'. Valid values are: todo, inprogress, done");
-            }
-
-            query = query.Where(x => x.Status == taskStatus);
-            _logger.LogInformation("Applied status filter: {Status}", taskStatus);
-        }
+        // Apply status filter (now mandatory)
+        query = query.Where(x => x.Status == taskStatus);
+        _logger.LogInformation("Applied status filter: {Status}", taskStatus);
 
         // Get total count for pagination
         var totalCount = await query.CountAsync(cancellationToken);
