@@ -60,11 +60,32 @@ function mapTaskResponse(task: TaskResponse): Task {
   };
 }
 
-export async function fetchTasks(): Promise<Task[]> {
-  const response = await fetch(`${API_BASE}/kanban/tasks`);
+export async function fetchTasks(status?: TaskStatus, page?: number, pageSize?: number): Promise<Task[]> {
+  const params = new URLSearchParams();
+  if (status) {
+    params.append('status', backendStatusByFrontend[status]);
+  }
+  if (page !== undefined) {
+    params.append('page', page.toString());
+  }
+  if (pageSize !== undefined) {
+    params.append('pageSize', pageSize.toString());
+  }
+
+  const url = `${API_BASE}/kanban/tasks${params.toString() ? `?${params.toString()}` : ''}`;
+  const response = await fetch(url);
   await checkResponse(response);
-  const result = await response.json() as TaskResponse[];
-  return result.map(mapTaskResponse);
+
+  // Handle both old format (array) and new format (paginated response)
+  const result = await response.json();
+  if (Array.isArray(result)) {
+    // Old format - direct array of tasks
+    return (result as TaskResponse[]).map(mapTaskResponse);
+  } else {
+    // New format - paginated response
+    const paginatedResult = result as { tasks: TaskResponse[] };
+    return paginatedResult.tasks.map(mapTaskResponse);
+  }
 }
 
 export async function createTask(payload: Pick<Task, 'title' | 'description' | 'status'>): Promise<Task> {

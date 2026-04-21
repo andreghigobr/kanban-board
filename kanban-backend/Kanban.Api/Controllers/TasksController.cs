@@ -38,15 +38,28 @@ public class TasksController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<TaskResponse>>> GetAll(CancellationToken cancellationToken = default)
+    public async Task<ActionResult<GetTasksResponse>> GetAll(
+        [FromQuery] int? page = null,
+        [FromQuery] int? pageSize = null,
+        [FromQuery] string? status = null,
+        CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation("HTTP GET /kanban/tasks - Retrieving all tasks");
+        _logger.LogInformation("HTTP GET /kanban/tasks - Retrieving tasks with filters - Page: {Page}, PageSize: {PageSize}, Status: {Status}",
+            page, pageSize, status);
 
-        var tasks = await _getTasksHandler.Handle(cancellationToken);
+        var request = new GetTasksRequest
+        {
+            Page = page,
+            PageSize = pageSize,
+            Status = status
+        };
 
-        _logger.LogInformation("HTTP GET /kanban/tasks - Returned {TaskCount} tasks", tasks.Count());
+        var response = await _getTasksHandler.Handle(request, cancellationToken);
 
-        return Ok(tasks);
+        _logger.LogInformation("HTTP GET /kanban/tasks - Returned {TaskCount} tasks (page {Page} of {TotalPages})",
+            response.Tasks.Count(), response.Page, response.TotalPages);
+
+        return Ok(response);
     }
 
     [HttpPost]

@@ -90,6 +90,12 @@
   font-size: 0.95rem;
 }
 
+.loadingMessage {
+  color: #6b7280;
+  font-size: 0.95rem;
+  font-style: italic;
+}
+
 .statusPanel {
   background: #ffffff;
   border: 1px solid #e5e7eb;

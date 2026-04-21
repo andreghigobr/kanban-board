@@ -1,7 +1,10 @@
+using Kanban.Api.Common.Errors;
+using Kanban.Api.Contracts.Requests;
 using Kanban.Api.Contracts.Responses;
 using Kanban.Api.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using TaskStatus = Kanban.Api.Domain.Enums.TaskStatus;
 
 namespace Kanban.Api.Features.Tasks.GetTasks;
 
@@ -16,12 +19,51 @@ public class GetTasksHandler
         _logger = logger;
     }
 
-    public async Task<IEnumerable<TaskResponse>> Handle(CancellationToken cancellationToken = default)
+    public async Task<GetTasksResponse> Handle(GetTasksRequest request, CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation("Retrieving all tasks");
+        _logger.LogInformation("Retrieving tasks with filters - Page: {Page}, PageSize: {PageSize}, Status: {Status}",
+            request.Page, request.PageSize, request.Status);
 
-        var tasks = await _context.Tasks
+        // Set defaults
+        var page = request.Page ?? 1;
+        var pageSize = request.PageSize ?? 50; // Default page size
+        var statusFilter = request.Status;
+
+        // Validate parameters
+        if (page < 1)
+        {
+            page = 1;
+        }
+
+        if (pageSize < 1 || pageSize > 100)
+        {
+            pageSize = 50; // Max page size
+        }
+
+        // Build query
+        var query = _context.Tasks.AsQueryable();
+
+        // Apply status filter if provided
+        if (!string.IsNullOrWhiteSpace(statusFilter))
+        {
+            if (!Enum.TryParse<TaskStatus>(statusFilter, ignoreCase: true, out var taskStatus))
+            {
+                _logger.LogWarning("Invalid status filter: {Status}", statusFilter);
+                throw new TaskValidationException($"Invalid status '{statusFilter}'. Valid values are: todo, inprogress, done");
+            }
+
+            query = query.Where(x => x.Status == taskStatus);
+            _logger.LogInformation("Applied status filter: {Status}", taskStatus);
+        }
+
+        // Get total count for pagination
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        // Apply ordering and pagination
+        var tasks = await query
             .OrderByDescending(x => x.CreatedAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .Select(x => new TaskResponse(
                 x.Id,
                 x.Title,
@@ -31,8 +73,15 @@ public class GetTasksHandler
                 x.UpdatedAt))
             .ToListAsync(cancellationToken);
 
-        _logger.LogInformation("Retrieved {TaskCount} tasks", tasks.Count);
+        _logger.LogInformation("Retrieved {TaskCount} tasks (page {Page} of {TotalPages}, total: {TotalCount})",
+            tasks.Count, page, (int)Math.Ceiling((double)totalCount / pageSize), totalCount);
 
-        return tasks;
+        return new GetTasksResponse
+        {
+            Tasks = tasks,
+            TotalCount = totalCount,
+            Page = page,
+            PageSize = pageSize
+        };
     }
 }

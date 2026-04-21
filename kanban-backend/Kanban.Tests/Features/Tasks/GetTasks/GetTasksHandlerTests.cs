@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Kanban.Api.Contracts.Requests;
 using Kanban.Api.Domain.Entities;
 using Kanban.Api.Features.Tasks.GetTasks;
 using Microsoft.Extensions.Logging;
@@ -35,21 +36,21 @@ public class GetTasksHandlerTests : IDisposable
         await _context.SaveChangesAsync();
 
         // Act
-        var result = await _handler.Handle();
+        var result = await _handler.Handle(new GetTasksRequest());
 
         // Assert
-        result.Should().HaveCount(2);
-        result.First().Title.Should().Be("Task 2"); // Ordered by CreatedAt descending
-        result.Last().Title.Should().Be("Task 1");
+        result.Tasks.Should().HaveCount(2);
+        result.Tasks.First().Title.Should().Be("Task 2"); // Ordered by CreatedAt descending
+        result.Tasks.Last().Title.Should().Be("Task 1");
     }
 
     [Fact]
     public async Task Handle_EmptyDatabase_ReturnsEmptyList()
     {
         // Act
-        var result = await _handler.Handle();
+        var result = await _handler.Handle(new GetTasksRequest());
 
         // Assert
-        result.Should().BeEmpty();
+        result.Tasks.Should().BeEmpty();
     }
 }
